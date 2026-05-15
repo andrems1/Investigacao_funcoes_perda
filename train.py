@@ -9,10 +9,10 @@ from PIL import Image
 from metrics import iou, dice_coeff, precision_recall, specificity, accuracy
 
 
-def train_one_epoch(model, loader, criterion, optimizer, device):
+def train_one_epoch(model, loader, criterion, optimizer, device, apply_sigmoid=True):
     model.train()
     total_loss = 0.0
-    total_acc = 0.0
+    total_acc  = 0.0
     start_time = time.time()
 
     for batch in loader:
@@ -26,13 +26,13 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
         optimizer.step()
 
         total_loss += loss.item()
-        total_acc  += accuracy(outputs, masks).item()
+        total_acc  += accuracy(outputs, masks, apply_sigmoid=apply_sigmoid).item()
 
     epoch_time = time.time() - start_time
     return total_loss / len(loader), total_acc / len(loader), epoch_time
 
 
-def validate_one_epoch(model, loader, criterion, device):
+def validate_one_epoch(model, loader, criterion, device, apply_sigmoid=True):
     model.eval()
     total_loss = 0.0
     total_acc  = 0.0
@@ -47,7 +47,7 @@ def validate_one_epoch(model, loader, criterion, device):
             loss = criterion(outputs, masks)
 
             total_loss += loss.item()
-            total_acc  += accuracy(outputs, masks).item()
+            total_acc  += accuracy(outputs, masks, apply_sigmoid=apply_sigmoid).item()
 
     epoch_time = time.time() - start_time
     return total_loss / len(loader), total_acc / len(loader), epoch_time
@@ -57,6 +57,7 @@ def train_model(
     model, train_loader, val_loader, criterion, optimizer, scheduler,
     num_epochs, device, experiment_dir,
     use_scheduler=False, use_early_stopping=False, patience=10,
+    apply_sigmoid=True,
 ):
     training_metrics_csv_path = os.path.join(experiment_dir, "training_metrics.csv")
     history = {
@@ -71,9 +72,11 @@ def train_model(
 
     for epoch in range(num_epochs):
         train_loss, train_acc, train_time = train_one_epoch(
-            model, train_loader, criterion, optimizer, device)
+            model, train_loader, criterion, optimizer, device,
+            apply_sigmoid=apply_sigmoid) 
         val_loss, val_acc, val_time = validate_one_epoch(
-            model, val_loader, criterion, device)
+            model, val_loader, criterion, device,
+            apply_sigmoid=apply_sigmoid) 
 
         history["train_loss"].append(train_loss)
         history["val_loss"].append(val_loss)

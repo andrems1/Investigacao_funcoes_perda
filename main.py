@@ -12,30 +12,7 @@ from loss import criterion, criterion_protoseg
 from train import train_model, test_and_save_results
 from utils import set_seed, get_device, save_hyperparameters, plot_curves
 from datasets import (
-    oral_epithelium_db_original,
-    oral_epithelium_db_augmented_rc_aug_f3,
-    oral_epithelium_db_augmented_geometric_f3,
-    oral_epithelium_db_augmented_distortion_f3,
-    oral_epithelium_db_augmented_cutout_f3,
-    oral_epithelium_db_augmented_grid_dropout_f3,
-    glas_db_original,
-    glas_db_augmented_rc_aug_f3,
-    glas_db_augmented_geometric_f3,
-    glas_db_augmented_distortion_f3,
-    glas_db_augmented_cutout_f3,
-    glas_db_augmented_grid_dropout_f3,
-    ocdc_db_original,
-    ocdc_db_augmented_rc_aug_f3,
-    ocdc_db_augmented_geometric_f3,
-    ocdc_db_augmented_distortion_f3,
-    ocdc_db_augmented_cutout_f3,
-    ocdc_db_augmented_grid_dropout_f3,
-    cryonuseg_db_original,
-    cryonuseg_db_augmented_rc_aug_f3,
-    cryonuseg_db_augmented_geometric_f3,
-    cryonuseg_db_augmented_distortion_f3,
-    cryonuseg_db_augmented_cutout_f3,
-    cryonuseg_db_augmented_grid_dropout_f3,
+    oral_epithelium_db_original
 )
 
 
@@ -164,11 +141,12 @@ def run_experiment(
         optimizer=optimizer,
         scheduler=scheduler,
         num_epochs=num_epochs,
-        device=device,
+        device=device,     
         experiment_dir=experiment_dir,
         use_scheduler=use_scheduler,
         use_early_stopping=use_early_stopping,
         patience=patience,
+        apply_sigmoid=apply_sig,
     )
 
     plot_curves(experiment_dir, experiment_name, history)
